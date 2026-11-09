@@ -1,5 +1,7 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AUTHOR } from "./articles";
+import { useSession } from "./auth";
+import { supabase } from "./supabase";
 import "./Wiser.css";
 
 export function Avatar({ size = 24 }) {
@@ -18,16 +20,45 @@ export function Avatar({ size = 24 }) {
   );
 }
 
-export default function WiserLayout({ children }) {
+function AuthorNav() {
+  const session = useSession();
+  const navigate = useNavigate();
+
+  if (!session) return null;
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    navigate("/wiser");
+  };
+
+  return (
+    <>
+      <Link to="/wiser/new" className="wiser-header__link">
+        Write
+      </Link>
+      <Link to="/wiser/stories" className="wiser-header__link">
+        Stories
+      </Link>
+      <button type="button" className="wiser-header__link" onClick={signOut}>
+        Sign out
+      </button>
+    </>
+  );
+}
+
+export default function WiserLayout({ children, status, actions }) {
   return (
     <div className="wiser">
       <header className="wiser-header">
-        <Link to="/wiser" className="wiser-header__logo">
-          Wiser
-        </Link>
-        <Link to="/portfolio" className="wiser-header__link">
-          Portfolio
-        </Link>
+        <div className="wiser-header__start">
+          <Link to="/wiser" className="wiser-header__logo">
+            WISER
+          </Link>
+          {status && <span className="wiser-header__status">{status}</span>}
+        </div>
+        <div className="wiser-header__actions">
+          {actions || <AuthorNav />}
+        </div>
       </header>
       {children}
     </div>

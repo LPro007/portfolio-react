@@ -35,14 +35,40 @@
 
 .wiser-header__logo {
   font-family: var(--wiser-serif);
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 700;
-  letter-spacing: -0.04em;
+  letter-spacing: 0.06em;
+}
+
+.wiser-header__start,
+.wiser-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-width: 0;
+}
+
+.wiser-header__status {
+  overflow: hidden;
+  color: var(--wiser-muted);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wiser button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
 }
 
 .wiser .wiser-header__link {
   color: var(--wiser-muted);
   font-size: 14px;
+  white-space: nowrap;
 }
 
 .wiser .wiser-header__link:hover {
@@ -195,16 +221,6 @@
   color: var(--wiser-muted);
   font-size: 14px;
   line-height: 20px;
-}
-
-.wiser .wiser-sidebar__link {
-  display: inline-block;
-  margin-top: 16px;
-  padding: 8px 16px;
-  border-radius: 99px;
-  background: var(--wiser-text);
-  color: #fff;
-  font-size: 14px;
 }
 
 /* Article */
@@ -368,6 +384,416 @@
   letter-spacing: 0.6em;
 }
 
+/* Shared controls */
+.wiser .wiser-button {
+  display: inline-block;
+  padding: 10px 20px;
+  border-radius: 99px;
+  background: var(--wiser-text);
+  color: #fff;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.wiser .wiser-button--green {
+  background: #1a8917;
+}
+
+.wiser .wiser-button--small {
+  padding: 6px 14px;
+  font-size: 13px;
+}
+
+.wiser .wiser-button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.wiser-error {
+  margin: 16px 0;
+  color: #c94a4a;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.wiser-article__byline .wiser-article__edit {
+  margin-left: auto;
+  color: var(--wiser-muted);
+  font-size: 14px;
+}
+
+/* Sign in */
+.wiser-login {
+  max-width: 360px;
+  margin: 0 auto;
+  padding: 96px 24px;
+}
+
+.wiser-login__title {
+  margin-bottom: 32px;
+  font-family: var(--wiser-serif);
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 40px;
+  text-align: center;
+}
+
+.wiser-field {
+  display: block;
+  margin-bottom: 20px;
+  font-size: 13px;
+}
+
+.wiser-field input {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: 6px;
+  padding: 10px 0;
+  border: 0;
+  border-bottom: 1px solid #c4c4c4;
+  color: var(--wiser-text);
+  font-size: 16px;
+  outline: none;
+}
+
+.wiser-field input:focus {
+  border-bottom-color: var(--wiser-text);
+}
+
+.wiser .wiser-login__submit {
+  display: block;
+  width: 100%;
+  margin-top: 28px;
+}
+
+/* Your stories */
+.wiser-stories {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 48px 24px 96px;
+}
+
+.wiser-stories__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.wiser-stories__title {
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 44px;
+  letter-spacing: -0.016em;
+}
+
+.wiser-story {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--wiser-line);
+}
+
+.wiser-story__title {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 26px;
+}
+
+.wiser-story .wiser-meta {
+  margin-top: 6px;
+}
+
+.wiser-story__actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+  color: var(--wiser-muted);
+  font-size: 13px;
+}
+
+/* Editor */
+.wiser-editor {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 48px 24px 160px;
+}
+
+.wiser-editor__title {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  margin-bottom: 16px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  outline: none;
+  resize: none;
+  color: var(--wiser-text);
+  font-family: var(--wiser-sans);
+  font-size: 42px;
+  font-weight: 700;
+  line-height: 52px;
+  letter-spacing: -0.011em;
+}
+
+.wiser-editor__title::placeholder,
+.wiser-editor__body p.is-editor-empty:first-child::before {
+  color: #b3b3b1;
+}
+
+.wiser-editor__body {
+  min-height: 300px;
+  outline: none;
+}
+
+.wiser-editor__body p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.wiser-editor__body img.ProseMirror-selectednode {
+  outline: 2px solid #1a8917;
+}
+
+.wiser-editor__notice {
+  color: var(--wiser-muted);
+  font-size: 14px;
+}
+
+/* Text selection toolbar */
+.wiser-bubble {
+  display: flex;
+  align-items: center;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: #242424;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+.wiser .wiser-bubble__button {
+  min-width: 34px;
+  height: 36px;
+  color: #fff;
+  font-family: var(--wiser-serif);
+  font-size: 18px;
+}
+
+.wiser .wiser-bubble__button--active {
+  color: #7fd67c;
+}
+
+.wiser .wiser-bubble__button--bold {
+  font-weight: 700;
+}
+
+.wiser .wiser-bubble__button--italic {
+  font-style: italic;
+}
+
+.wiser .wiser-bubble__button--text {
+  padding: 0 6px;
+  font-family: var(--wiser-sans);
+  font-size: 14px;
+}
+
+.wiser .wiser-bubble__button--small {
+  font-size: 14px;
+}
+
+.wiser-bubble__divider {
+  width: 1px;
+  height: 18px;
+  margin: 0 6px;
+  background: #6b6b6b;
+}
+
+.wiser-bubble__input {
+  width: 240px;
+  height: 36px;
+  padding: 0 6px;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: #fff;
+  font-size: 14px;
+}
+
+/* Empty-line insert menu */
+.wiser-insert {
+  position: relative;
+  z-index: 5;
+}
+
+.wiser .wiser-insert__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #1a8917;
+  border-radius: 50%;
+  background: #fff;
+  color: #1a8917;
+  font-size: 11px;
+}
+
+.wiser .wiser-insert__toggle {
+  border-color: var(--wiser-text);
+  color: var(--wiser-text);
+  font-size: 22px;
+  font-weight: 300;
+  transition: transform 0.15s ease;
+}
+
+.wiser .wiser-insert__toggle--open {
+  transform: rotate(45deg);
+}
+
+.wiser-insert__options {
+  position: absolute;
+  top: 0;
+  left: 44px;
+  display: flex;
+  gap: 8px;
+  padding: 0 8px 8px 0;
+  background: #fff;
+}
+
+/* Publish dialog */
+.wiser-publish {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  overflow-y: auto;
+  padding: 72px 24px 48px;
+  background: #fff;
+}
+
+.wiser .wiser-publish__close {
+  position: absolute;
+  top: 16px;
+  right: 24px;
+  color: var(--wiser-muted);
+  font-size: 32px;
+  line-height: 1;
+}
+
+.wiser-publish__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  width: 100%;
+  max-width: 1000px;
+  margin: auto;
+}
+
+.wiser-publish__heading {
+  margin-bottom: 16px;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 24px;
+}
+
+.wiser .wiser-publish__cover {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background: #fafafa;
+  color: var(--wiser-muted);
+  font-size: 14px;
+}
+
+.wiser-publish__cover span {
+  padding: 24px;
+}
+
+.wiser-publish__cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.wiser .wiser-publish__remove {
+  margin-top: 8px;
+  color: var(--wiser-muted);
+  font-size: 13px;
+  text-decoration: underline;
+}
+
+.wiser-publish__title,
+.wiser-publish__subtitle {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 8px 0;
+  border: 0;
+  border-bottom: 1px solid #e6e6e6;
+  outline: none;
+  color: var(--wiser-text);
+}
+
+.wiser-publish__title {
+  margin-top: 16px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.wiser-publish__subtitle {
+  margin-top: 4px;
+  font-size: 14px;
+}
+
+.wiser-publish__note,
+.wiser-publish__label {
+  color: var(--wiser-muted);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.wiser-publish__note {
+  margin-top: 16px;
+}
+
+.wiser-publish__to {
+  margin-bottom: 24px;
+  font-size: 16px;
+}
+
+.wiser-publish__tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 24px;
+  padding: 8px;
+  background: #fafafa;
+}
+
+.wiser-publish__tags .wiser-pill {
+  display: inline-flex;
+  gap: 8px;
+  padding: 4px 12px;
+  background: #fff;
+}
+
+.wiser-publish__tags input {
+  flex: 1;
+  min-width: 120px;
+  padding: 6px;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+}
+
 @media (max-width: 960px) {
   .wiser-sidebar {
     display: none;
@@ -402,6 +828,24 @@
   .wiser-article__title {
     font-size: 32px;
     line-height: 40px;
+  }
+
+  .wiser-editor {
+    padding: 32px 16px 120px;
+  }
+
+  .wiser-editor__title {
+    font-size: 32px;
+    line-height: 40px;
+  }
+
+  .wiser-header__status {
+    display: none;
+  }
+
+  .wiser-publish__grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
   }
 
   .wiser-article__subtitle {

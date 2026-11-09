@@ -1,0 +1,22 @@
+# Free Supabase projects pause after too little database activity in a week,
+# which would take the blog offline. A small read every 8 hours prevents that.
+name: Keep Supabase awake
+
+on:
+  schedule:
+    - cron: "17 */8 * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read from the database
+        run: |
+          set -a
+          . ./.env
+          set +a
+          curl --fail --silent --show-error --output /dev/null \
+            "$REACT_APP_SUPABASE_URL/rest/v1/articles?select=id&limit=1" \
+            -H "apikey: $REACT_APP_SUPABASE_PUBLISHABLE_KEY"

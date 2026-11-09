@@ -7,6 +7,17 @@
     "node": ">=12.x"
   },
   "dependencies": {
+    "@floating-ui/dom": "^1.8.0",
+    "@supabase/supabase-js": "^2.119.0",
+    "@tiptap/core": "^3.33.0",
+    "@tiptap/extension-bubble-menu": "^3.33.0",
+    "@tiptap/extension-floating-menu": "^3.33.0",
+    "@tiptap/extension-image": "^3.33.0",
+    "@tiptap/extensions": "^3.33.0",
+    "@tiptap/markdown": "^3.33.0",
+    "@tiptap/pm": "^3.33.0",
+    "@tiptap/react": "^3.33.0",
+    "@tiptap/starter-kit": "^3.33.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-markdown": "^9.1.0",

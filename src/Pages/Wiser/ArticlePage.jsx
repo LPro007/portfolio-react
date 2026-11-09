@@ -2,12 +2,13 @@ import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import WiserLayout, { Avatar } from "./WiserLayout";
-import { AUTHOR, formatDate, useArticles } from "./articles";
+import { AUTHOR, formatDate, useArticle } from "./articles";
+import { useSession } from "./auth";
 
 export default function ArticlePage() {
   const { slug } = useParams();
-  const { articles, error } = useArticles();
-  const article = articles && articles.find((a) => a.slug === slug);
+  const { data: article, error, loading } = useArticle(slug);
+  const session = useSession();
   const title = article ? article.title : null;
 
   useEffect(() => {
@@ -25,7 +26,7 @@ export default function ArticlePage() {
         This article couldn't be loaded. Please refresh the page.
       </p>
     );
-  } else if (!articles) {
+  } else if (loading) {
     content = <p className="wiser-status">Loading…</p>;
   } else if (!article) {
     content = (
@@ -45,9 +46,17 @@ export default function ArticlePage() {
           <div>
             <div className="wiser-article__author">{AUTHOR}</div>
             <p className="wiser-meta">
-              {article.readTime} min read · {formatDate(article.date)}
+              {article.read_time} min read · {formatDate(article.published_at)}
             </p>
           </div>
+          {session && (
+            <Link
+              to={`/wiser/edit/${article.id}`}
+              className="wiser-article__edit"
+            >
+              Edit
+            </Link>
+          )}
         </div>
         {article.cover && (
           <img className="wiser-article__cover" src={article.cover} alt="" />

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import WiserLayout, { Avatar } from "./WiserLayout";
-import { AUTHOR, formatDate, useArticles } from "./articles";
+import { AUTHOR, formatDate, usePublishedArticles } from "./articles";
 
 function ArticleCard({ article }) {
   return (
@@ -22,14 +22,14 @@ function ArticleCard({ article }) {
         )}
       </Link>
       <p className="wiser-meta">
-        {formatDate(article.date)} · {article.readTime} min read
+        {formatDate(article.published_at)} · {article.read_time} min read
       </p>
     </article>
   );
 }
 
 export default function WiserHome() {
-  const { articles, error } = useArticles();
+  const { data: articles, error, loading } = usePublishedArticles();
   const [searchParams] = useSearchParams();
   const activeTag = searchParams.get("tag");
 
@@ -71,22 +71,19 @@ export default function WiserHome() {
               Articles couldn't be loaded. Please refresh the page.
             </p>
           )}
-          {!error && !articles && <p className="wiser-status">Loading…</p>}
+          {loading && <p className="wiser-status">Loading…</p>}
           {articles && visible.length === 0 && (
             <p className="wiser-status">No articles here yet.</p>
           )}
           {visible.map((article) => (
-            <ArticleCard key={article.slug} article={article} />
+            <ArticleCard key={article.id} article={article} />
           ))}
         </main>
 
         <aside className="wiser-sidebar">
           <Avatar size={64} />
           <h2 className="wiser-sidebar__name">{AUTHOR}</h2>
-          <p className="wiser-sidebar__bio">Writing on Wiser.</p>
-          <Link to="/portfolio" className="wiser-sidebar__link">
-            View portfolio
-          </Link>
+          <p className="wiser-sidebar__bio">Writing on WISER.</p>
         </aside>
       </div>
     </WiserLayout>

@@ -1,104 +1,161 @@
 import { useEffect, useState } from "react";
+import { supabase } from "./supabase";
 
 export const AUTHOR = "Daniel Brambila";
 
-// Every .md file in src/content/articles is published; its filename is the URL slug.
-const articleFiles = require.context("../../content/articles", false, /\.md$/);
-
+const IMAGE_BUCKET = "article-images";
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 const WORDS_PER_MINUTE = 225;
+const SUMMARY_COLUMNS =
+  "id,slug,title,subtitle,cover,tags,read_time,published_at,updated_at";
 
-function parseArticle(slug, raw) {
-  const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
-  if (!match) return null;
+function unwrap({ data, error }) {
+  if (error) throw error;
+  return data;
+}
 
-  const meta = {};
-  match[1].split(/\r?\n/).forEach((line) => {
-    const colon = line.indexOf(":");
-    if (colon === -1) return;
-    const key = line.slice(0, colon).trim();
-    meta[key] = line
-      .slice(colon + 1)
-      .trim()
-      .replace(/^(["'])(.*)\1$/, "$2");
+function useQuery(run, key) {
+  const [state, setState] = useState({
+    data: null,
+    error: null,
+    loading: true,
   });
-
-  if (!meta.title || !/^\d{4}-\d{2}-\d{2}$/.test(meta.date || "")) return null;
-
-  const body = match[2].trim();
-  const words = body.split(/\s+/).filter(Boolean).length;
-
-  return {
-    slug,
-    title: meta.title,
-    subtitle: meta.subtitle || "",
-    date: meta.date,
-    cover: meta.cover || "",
-    tags: (meta.tags || "")
-      .split(",")
-      .map((tag) => tag.trim())
-      .filter(Boolean),
-    readTime: Math.max(1, Math.ceil(words / WORDS_PER_MINUTE)),
-    body,
-  };
-}
-
-async function fetchArticle(key) {
-  const slug = key.replace(/^\.\//, "").replace(/\.md$/, "");
-  const response = await fetch(articleFiles(key));
-  if (!response.ok) throw new Error(`Could not load article "${slug}"`);
-
-  const article = parseArticle(slug, await response.text());
-  if (!article) {
-    console.warn(
-      `Skipping article "${slug}": it needs frontmatter with a title and a YYYY-MM-DD date.`
-    );
-  }
-  return article;
-}
-
-let articlesPromise = null;
-
-function loadArticles() {
-  if (!articlesPromise) {
-    articlesPromise = Promise.all(articleFiles.keys().map(fetchArticle))
-      .then((articles) =>
-        articles
-          .filter(Boolean)
-          .sort((a, b) => b.date.localeCompare(a.date))
-      )
-      .catch((error) => {
-        articlesPromise = null;
-        throw error;
-      });
-  }
-  return articlesPromise;
-}
-
-// `articles` is null until loaded.
-export function useArticles() {
-  const [state, setState] = useState({ articles: null, error: null });
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
-    loadArticles().then(
-      (articles) => !cancelled && setState({ articles, error: null }),
-      (error) => !cancelled && setState({ articles: null, error })
+    setState({ data: null, error: null, loading: true });
+    run().then(
+      (data) =>
+        !cancelled && setState({ data, error: null, loading: false }),
+      (error) =>
+        !cancelled && setState({ data: null, error, loading: false })
     );
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [key, attempt]);
 
-  return state;
+  return { ...state, reload: () => setAttempt((n) => n + 1) };
 }
 
-// Dates are calendar days, so format in UTC to stop them shifting back a day
-// in timezones behind UTC.
-export function formatDate(date) {
-  return new Date(`${date}T00:00:00Z`).toLocaleDateString("en-US", {
+export function usePublishedArticles() {
+  return useQuery(
+    async () =>
+      unwrap(
+        await supabase
+          .from("articles")
+          .select(SUMMARY_COLUMNS)
+          .not("published_at", "is", null)
+          .order("published_at", { ascending: false })
+      ),
+    "published"
+  );
+}
+
+export function useArticle(slug) {
+  return useQuery(
+    async () =>
+      unwrap(
+        await supabase
+          .from("articles")
+          .select("*")
+          .eq("slug", slug)
+          .not("published_at", "is", null)
+          .maybeSingle()
+      ),
+    slug
+  );
+}
+
+export function useStories() {
+  return useQuery(
+    async () =>
+      unwrap(
+        await supabase
+          .from("articles")
+          .select(SUMMARY_COLUMNS)
+          .order("updated_at", { ascending: false })
+      ),
+    "stories"
+  );
+}
+
+export function useArticleById(id) {
+  return useQuery(
+    async () =>
+      unwrap(
+        await supabase.from("articles").select("*").eq("id", id).maybeSingle()
+      ),
+    id
+  );
+}
+
+function readTime(body) {
+  const words = body.split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / WORDS_PER_MINUTE));
+}
+
+// `publication` is only passed on first publish, so an autosave can never
+// change whether or where an article is published.
+export async function saveArticle(id, draft, publication = {}) {
+  unwrap(
+    await supabase.from("articles").upsert({
+      id,
+      title: draft.title,
+      subtitle: draft.subtitle,
+      body: draft.body,
+      cover: draft.cover,
+      tags: draft.tags,
+      read_time: readTime(draft.body),
+      updated_at: new Date().toISOString(),
+      ...publication,
+    })
+  );
+}
+
+// The random suffix keeps slugs unique and clear of routes like /wiser/new.
+export function makeSlug(title) {
+  const base = title
+    .normalize("NFKD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 70)
+    .replace(/-+$/, "");
+  const suffix = crypto.randomUUID().slice(0, 6);
+  return base ? `${base}-${suffix}` : suffix;
+}
+
+export async function deleteArticle(id) {
+  unwrap(await supabase.from("articles").delete().eq("id", id));
+}
+
+export async function uploadImage(articleId, file) {
+  if (!file.type.startsWith("image/")) {
+    throw new Error("That file isn't an image.");
+  }
+  if (file.size > MAX_IMAGE_BYTES) {
+    throw new Error("Images must be 5 MB or smaller.");
+  }
+
+  const extension = file.type.split("/")[1];
+  const path = `${articleId}/${crypto.randomUUID()}.${extension}`;
+  const bucket = supabase.storage.from(IMAGE_BUCKET);
+  unwrap(
+    await bucket.upload(path, file, {
+      cacheControl: "31536000",
+      contentType: file.type,
+    })
+  );
+  return bucket.getPublicUrl(path).data.publicUrl;
+}
+
+export function formatDate(isoDate) {
+  return new Date(isoDate).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
-    timeZone: "UTC",
   });
 }
