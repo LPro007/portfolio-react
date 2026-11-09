@@ -1,13 +1,14 @@
 {
   "files": {
-    "main.css": "/static/css/main.189f0f30.css",
-    "main.js": "/static/js/main.1c223f23.js",
+    "main.css": "/static/css/main.c5818f15.css",
+    "main.js": "/static/js/main.196ca92b.js",
     "index.html": "/index.html",
-    "main.189f0f30.css.map": "/static/css/main.189f0f30.css.map",
-    "main.1c223f23.js.map": "/static/js/main.1c223f23.js.map"
+    "static/media/welcome-to-wiser.md": "/static/media/welcome-to-wiser.dcdef90d91d30d1117c1.md",
+    "main.c5818f15.css.map": "/static/css/main.c5818f15.css.map",
+    "main.196ca92b.js.map": "/static/js/main.196ca92b.js.map"
   },
   "entrypoints": [
-    "static/css/main.189f0f30.css",
-    "static/js/main.1c223f23.js"
+    "static/css/main.c5818f15.css",
+    "static/js/main.196ca92b.js"
   ]
 }
