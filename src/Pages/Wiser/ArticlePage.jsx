@@ -3,12 +3,12 @@ import { Link, useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import WiserLayout, { Avatar } from "./WiserLayout";
 import { AUTHOR, formatDate, useArticle } from "./articles";
-import { useSession } from "./auth";
+import { useAuth } from "./auth";
+import { Responses, StatsBar, useEngagement } from "./Engagement";
 
 export default function ArticlePage() {
   const { slug } = useParams();
   const { data: article, error, loading } = useArticle(slug);
-  const session = useSession();
   const title = article ? article.title : null;
 
   useEffect(() => {
@@ -35,7 +35,22 @@ export default function ArticlePage() {
       </p>
     );
   } else {
-    content = (
+    content = <ArticleView key={article.id} article={article} />;
+  }
+
+  return (
+    <WiserLayout>
+      <main className="wiser-article">{content}</main>
+    </WiserLayout>
+  );
+}
+
+function ArticleView({ article }) {
+  const { isAuthor } = useAuth();
+  const engagement = useEngagement(article);
+
+  return (
+    <>
       <article>
         <h1 className="wiser-article__title">{article.title}</h1>
         {article.subtitle && (
@@ -49,7 +64,7 @@ export default function ArticlePage() {
               {article.read_time} min read · {formatDate(article.published_at)}
             </p>
           </div>
-          {session && (
+          {isAuthor && (
             <Link
               to={`/wiser/edit/${article.id}`}
               className="wiser-article__edit"
@@ -58,6 +73,7 @@ export default function ArticlePage() {
             </Link>
           )}
         </div>
+        <StatsBar engagement={engagement} />
         {article.cover && (
           <img className="wiser-article__cover" src={article.cover} alt="" />
         )}
@@ -78,12 +94,7 @@ export default function ArticlePage() {
           </div>
         )}
       </article>
-    );
-  }
-
-  return (
-    <WiserLayout>
-      <main className="wiser-article">{content}</main>
-    </WiserLayout>
+      <Responses article={article} engagement={engagement} />
+    </>
   );
 }

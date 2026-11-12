@@ -3,12 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import WiserLayout from "./WiserLayout";
 import RichEditor from "./RichEditor";
 import PublishDialog from "./PublishDialog";
-import {
-  makeSlug,
-  saveArticle,
-  uploadImage,
-  useArticleById,
-} from "./articles";
+import { makeSlug, saveArticle, uploadImage, useArticleById } from "./articles";
 
 const AUTOSAVE_DELAY = 1000;
 
@@ -67,7 +62,7 @@ function Editor({ id, existing }) {
       saveQueue.current = task.catch(() => {});
       return task;
     },
-    [id]
+    [id],
   );
 
   const autosave = useCallback(() => {
@@ -86,7 +81,7 @@ function Editor({ id, existing }) {
     () => () => {
       if (!isPublished && version.current !== savedVersion.current) autosave();
     },
-    [isPublished, autosave]
+    [isPublished, autosave],
   );
 
   useEffect(() => {

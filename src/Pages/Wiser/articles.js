@@ -26,10 +26,8 @@ function useQuery(run, key) {
     let cancelled = false;
     setState({ data: null, error: null, loading: true });
     run().then(
-      (data) =>
-        !cancelled && setState({ data, error: null, loading: false }),
-      (error) =>
-        !cancelled && setState({ data: null, error, loading: false })
+      (data) => !cancelled && setState({ data, error: null, loading: false }),
+      (error) => !cancelled && setState({ data: null, error, loading: false }),
     );
     return () => {
       cancelled = true;
@@ -47,9 +45,9 @@ export function usePublishedArticles() {
           .from("articles")
           .select(SUMMARY_COLUMNS)
           .not("published_at", "is", null)
-          .order("published_at", { ascending: false })
+          .order("published_at", { ascending: false }),
       ),
-    "published"
+    "published",
   );
 }
 
@@ -62,9 +60,9 @@ export function useArticle(slug) {
           .select("*")
           .eq("slug", slug)
           .not("published_at", "is", null)
-          .maybeSingle()
+          .maybeSingle(),
       ),
-    slug
+    slug,
   );
 }
 
@@ -75,9 +73,9 @@ export function useStories() {
         await supabase
           .from("articles")
           .select(SUMMARY_COLUMNS)
-          .order("updated_at", { ascending: false })
+          .order("updated_at", { ascending: false }),
       ),
-    "stories"
+    "stories",
   );
 }
 
@@ -85,9 +83,9 @@ export function useArticleById(id) {
   return useQuery(
     async () =>
       unwrap(
-        await supabase.from("articles").select("*").eq("id", id).maybeSingle()
+        await supabase.from("articles").select("*").eq("id", id).maybeSingle(),
       ),
-    id
+    id,
   );
 }
 
@@ -110,7 +108,7 @@ export async function saveArticle(id, draft, publication = {}) {
       read_time: readTime(draft.body),
       updated_at: new Date().toISOString(),
       ...publication,
-    })
+    }),
   );
 }
 
@@ -147,9 +145,72 @@ export async function uploadImage(articleId, file) {
     await bucket.upload(path, file, {
       cacheControl: "31536000",
       contentType: file.type,
-    })
+    }),
   );
   return bucket.getPublicUrl(path).data.publicUrl;
+}
+
+const COMMENT_COLUMNS =
+  "id,body,created_at,user_id,profiles(display_name,avatar_url)";
+
+export async function recordView(articleId) {
+  unwrap(await supabase.rpc("record_view", { article_id: articleId }));
+}
+
+export async function fetchHearted(articleId, userId) {
+  const row = unwrap(
+    await supabase
+      .from("hearts")
+      .select("article_id")
+      .eq("article_id", articleId)
+      .eq("user_id", userId)
+      .maybeSingle(),
+  );
+  return Boolean(row);
+}
+
+export async function setHeart(articleId, userId, hearted) {
+  if (hearted) {
+    unwrap(await supabase.from("hearts").insert({ article_id: articleId }));
+  } else {
+    unwrap(
+      await supabase
+        .from("hearts")
+        .delete()
+        .eq("article_id", articleId)
+        .eq("user_id", userId),
+    );
+  }
+}
+
+export async function fetchComments(articleId) {
+  return unwrap(
+    await supabase
+      .from("comments")
+      .select(COMMENT_COLUMNS)
+      .eq("article_id", articleId)
+      .order("created_at", { ascending: false }),
+  );
+}
+
+export async function addComment(articleId, body) {
+  return unwrap(
+    await supabase
+      .from("comments")
+      .insert({ article_id: articleId, body })
+      .select(COMMENT_COLUMNS)
+      .single(),
+  );
+}
+
+export async function deleteComment(id) {
+  unwrap(await supabase.from("comments").delete().eq("id", id));
+}
+
+const compact = new Intl.NumberFormat("en-US", { notation: "compact" });
+
+export function formatCount(count) {
+  return compact.format(count || 0);
 }
 
 export function formatDate(isoDate) {

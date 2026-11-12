@@ -189,8 +189,8 @@ export default function PublishDialog({
             {publishing
               ? "Publishing…"
               : isPublished
-              ? "Save and publish"
-              : "Publish now"}
+                ? "Save and publish"
+                : "Publish now"}
           </button>
         </section>
       </div>

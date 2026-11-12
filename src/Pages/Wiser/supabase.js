@@ -11,5 +11,8 @@ if (!url || !key) {
 // With placeholders, requests fail and the blog shows its normal error state.
 export const supabase = createClient(
   url || "http://localhost:54321",
-  key || "not-configured"
+  key || "not-configured",
+  // PKCE returns from Google with ?code=, which survives the GitHub Pages
+  // 404 fallback; the library exchanges it and removes it from the URL.
+  { auth: { flowType: "pkce" } },
 );

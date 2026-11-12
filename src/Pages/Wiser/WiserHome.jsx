@@ -39,7 +39,7 @@ export default function WiserHome() {
 
   const tags = [...new Set((articles || []).flatMap((a) => a.tags))].sort();
   const visible = (articles || []).filter(
-    (article) => !activeTag || article.tags.includes(activeTag)
+    (article) => !activeTag || article.tags.includes(activeTag),
   );
 
   return (

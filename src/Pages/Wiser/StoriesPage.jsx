@@ -17,7 +17,11 @@ export default function StoriesPage() {
   const visible = tab === "drafts" ? drafts : published;
 
   const remove = async (story) => {
-    if (!window.confirm(`Delete "${story.title || "Untitled"}"? This can't be undone.`)) {
+    if (
+      !window.confirm(
+        `Delete "${story.title || "Untitled"}"? This can't be undone.`,
+      )
+    ) {
       return;
     }
     setDeleteError("");

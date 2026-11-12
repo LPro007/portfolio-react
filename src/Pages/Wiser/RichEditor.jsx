@@ -91,18 +91,45 @@ function FormatMenu({ editor }) {
         />
       ) : (
         <>
-          {button("B", "Bold", active.bold, () =>
-            editor.chain().focus().toggleBold().run(), "wiser-bubble__button--bold")}
-          {button("i", "Italic", active.italic, () =>
-            editor.chain().focus().toggleItalic().run(), "wiser-bubble__button--italic")}
-          {button("Link", "Link", active.link, openLink, "wiser-bubble__button--text")}
+          {button(
+            "B",
+            "Bold",
+            active.bold,
+            () => editor.chain().focus().toggleBold().run(),
+            "wiser-bubble__button--bold",
+          )}
+          {button(
+            "i",
+            "Italic",
+            active.italic,
+            () => editor.chain().focus().toggleItalic().run(),
+            "wiser-bubble__button--italic",
+          )}
+          {button(
+            "Link",
+            "Link",
+            active.link,
+            openLink,
+            "wiser-bubble__button--text",
+          )}
           <span className="wiser-bubble__divider" />
-          {button("T", "Large heading", active.h2, () =>
-            editor.chain().focus().toggleHeading({ level: 2 }).run(), "wiser-bubble__button--bold")}
-          {button("T", "Small heading", active.h3, () =>
-            editor.chain().focus().toggleHeading({ level: 3 }).run(), "wiser-bubble__button--small")}
+          {button(
+            "T",
+            "Large heading",
+            active.h2,
+            () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
+            "wiser-bubble__button--bold",
+          )}
+          {button(
+            "T",
+            "Small heading",
+            active.h3,
+            () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
+            "wiser-bubble__button--small",
+          )}
           {button("❝", "Quote", active.quote, () =>
-            editor.chain().focus().toggleBlockquote().run())}
+            editor.chain().focus().toggleBlockquote().run(),
+          )}
         </>
       )}
     </BubbleMenu>
@@ -154,10 +181,10 @@ function InsertMenu({ editor, onPickImage }) {
         <div className="wiser-insert__options">
           {action("Img", "Add an image", onPickImage)}
           {action("{ }", "Add a code block", () =>
-            editor.chain().focus().toggleCodeBlock().run()
+            editor.chain().focus().toggleCodeBlock().run(),
           )}
           {action("···", "Add a divider", () =>
-            editor.chain().focus().setHorizontalRule().run()
+            editor.chain().focus().setHorizontalRule().run(),
           )}
         </div>
       )}
@@ -194,9 +221,7 @@ export default function RichEditor({
   };
 
   const imagesFrom = (fileList) =>
-    Array.from(fileList || []).filter((file) =>
-      file.type.startsWith("image/")
-    );
+    Array.from(fileList || []).filter((file) => file.type.startsWith("image/"));
 
   const editor = useEditor({
     extensions: [
